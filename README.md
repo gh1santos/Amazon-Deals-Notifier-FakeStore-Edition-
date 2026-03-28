@@ -1,162 +1,68 @@
 Amazon Deals Notifier (FakeStore Edition)
 
-Sistema de monitoramento de ofertas baseado na FakeStore API
- com envio automático de notificações via Telegram.
+![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=for-the-badge&logo=springboot)
+![H2](https://img.shields.io/badge/H2-Database-blue?style=for-the-badge&logo=databricks)
 
-O projeto é desenvolvido em Java 21 com Spring Boot, utilizando Spring Data JPA para persistência em banco H2, e segue boas práticas de arquitetura para aplicações RESTful.
+Sistema inteligente de monitoramento de ofertas baseado na **FakeStore API** com envio automático de notificações via **Telegram**. O projeto utiliza algoritmos de score para filtrar o que é realmente uma oportunidade relevante.
 
-Funcionalidades
-Monitoramento de produtos da FakeStore API.
-Cálculo automático de desconto comparando preço atual com preço original.
-Score inteligente de ofertas, considerando:
-Desconto
-Preço
-Avaliação do produto (rating)
-Número de avaliações
-Filtragem de ofertas relevantes, com base em desconto mínimo configurável.
-Envio de notificações via Telegram com título, preço, desconto e link do produto.
-Endpoints REST para:
-Listar todas as ofertas
-Listar últimas ofertas
-Listar melhores ofertas com base no score
-Agendamento automático de busca de ofertas (@Scheduled).
-Tratamento global de erros com resposta padronizada (ApiError).
-Tecnologias Utilizadas
-Java 17
-Spring Boot 3.x
-Spring Data JPA / H2
-Lombok
-Spring Scheduler (@Scheduled)
-REST Template
-OpenAPI / Swagger (documentação da API)
-Estrutura do Projeto
+---
+
+## Funcionalidades
+
+* **Monitoramento Ativo:** Busca periódica de novos produtos via `Spring Scheduler`.
+* **Cálculo de Desconto:** Identifica automaticamente a porcentagem de desconto baseada no preço original.
+* **Smart Scoring:** Sistema de pontuação que cruza dados de preço, desconto e avaliação dos usuários.
+* **Filtro Configurável:** Notifica apenas ofertas que atingem um patamar mínimo de desconto.
+* **Notificações Real-time:** Alertas formatados no Telegram com link e detalhes do produto.
+* **API REST:** Endpoints para consulta manual, listagem de melhores ofertas e testes de erro.
+
+---
+
+## 🧠 Lógica de Negócio
+
+O sistema não apenas lista produtos, ele os "rankeia" para evitar spam de ofertas ruins.
+
+### 1. Cálculo de Desconto
+$$Discount = \frac{OriginalPrice - CurrentPrice}{OriginalPrice} \times 100$$
+
+### 2. Algoritmo de Score
+Para definir a qualidade de uma oferta, utilizamos a fórmula:
+$$Score = (Desc \times 0.5) + (\frac{100}{Preço} \times 0.2) + (Rating \times 5) + \log(Reviews + 1)$$
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+* **Core:** Java 21 & Spring Boot 3
+* **Dados:** Spring Data JPA & H2 Database (In-memory)
+* **Integração:** Rest Template & Telegram Bot API
+* **Utilitários:** Lombok & MapStruct
+* **Documentação:** OpenAPI / Swagger UI
+
+---
+
+## 📂 Estrutura do Projeto
+
+```text
 src/main/java/com/ghdev/amazondealsnotifier
-├─ client        # Comunicação com APIs externas (FakeStore)
-├─ config        # Configurações do projeto (Telegram, Scheduler, Deal)
-├─ controller    # Endpoints REST
-├─ dto           # Objetos de resposta para API
-├─ exception     # Tratamento global de exceções
-├─ mapper        # Mapeamento DTO -> Entity
-├─ model         # Entidades JPA e DTOs
-├─ repository    # Repositórios Spring Data
-└─ service       # Lógica de negócio e integração com Telegram
-Configuração do Projeto
-1. Variáveis de Ambiente
-
-Para não expor credenciais no Git, utilize um arquivo .env na raiz do projeto:
-
-# Banco de dados H2
+├─ client      # Integração com APIs externas (FakeStore/Telegram)
+├─ config      # Configurações de Beans, Telegram e Scheduler
+├─ controller  # Endpoints da API REST
+├─ dto         # Objetos de transferência e respostas da API
+├─ exception   # Tratamento global de erros (ApiError)
+├─ mapper      # Mapeamento de Entidades para DTOs
+├─ model       # Entidades JPA e Regras de Domínio
+├─ repository  # Interfaces de persistência
+└─ service     # Lógica de negócio e regras de notificação
+🚀 Como Executar1. Configurar Variáveis de AmbienteCrie um arquivo .env na raiz do projeto para proteger suas credenciais:Properties# Database
 SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
 SPRING_DATASOURCE_USERNAME=sa
 SPRING_DATASOURCE_PASSWORD=1234
 
-# Telegram
+# Telegram API
 TELEGRAM_BOT_TOKEN=seu_token_aqui
 TELEGRAM_CHAT_ID=seu_chat_id_aqui
-
-⚠️ O arquivo .env não deve ser versionado. Já está incluído no .gitignore.
-
-2. application.yml
-
-O arquivo principal de configuração referencia as variáveis do .env:
-
-server:
-  port: 8081
-
-deal:
-  min-discount: 20
-
-scheduler:
-  interval: 600000 # 10 minutos
-
-spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-telegram:
-  bot-token: ${TELEGRAM_BOT_TOKEN}
-  chat-id: ${TELEGRAM_CHAT_ID}
-Endpoints da API
-Método	Endpoint	Descrição
-GET	/deals	Lista todas as ofertas paginadas
-GET	/deals/latest	Lista as últimas ofertas encontradas
-GET	/deals/top	Lista as melhores ofertas por score
-POST	/deals/fetch	Busca novas ofertas da API e envia notificações via Telegram
-GET	/deals/error-test	Endpoint para testar tratamento de erros
-Lógica de Negócio
-
-Cálculo de desconto:
-
-𝑑
-𝑖
-𝑠
-𝑐
-𝑜
-𝑢
-𝑛
-𝑡
-=
-𝑜
-𝑟
-𝑖
-𝑔
-𝑖
-𝑛
-𝑎
-𝑙
-𝑃
-𝑟
-𝑖
-𝑐
-𝑒
-−
-𝑝
-𝑟
-𝑖
-𝑐
-𝑒
-𝑜
-𝑟
-𝑖
-𝑔
-𝑖
-𝑛
-𝑎
-𝑙
-𝑃
-𝑟
-𝑖
-𝑐
-𝑒
-∗
-100
-discount=
-originalPrice
-originalPrice−price
-	​
-
-∗100
-Score de ofertas: combina múltiplos fatores para priorizar produtos mais relevantes:
-score = (desconto * 0.5) + ((100 / preço) * 0.2) + (rating * 5) + log(número de reviews + 1)
-Filtragem: apenas produtos com desconto acima do valor configurado (deal.min-discount) são considerados.
-Notificação Telegram: mensagem com título, preço, desconto, link e imagem do produto (se disponível).
-Considerações Técnicas
-Spring Scheduler: permite execução automática de verificações periódicas.
-Cache de ofertas: produtos já salvos não são reprocessados nem reenviados.
-Tratamento global de exceções: todas exceções são convertidas em objetos ApiError com status, mensagem e timestamp.
-H2 Console: disponível em /h2-console para inspeção de dados em memória.
-Como Rodar
-Configurar variáveis de ambiente no .env.
-Executar o projeto via Maven:
-./mvnw spring-boot:run
-A API estará disponível em http://localhost:8081/deals
-Swagger/OpenAPI: http://localhost:8081/swagger-ui.html
+2. Rodar a AplicaçãoExecute o Maven via terminal:Bash./mvnw spring-boot:run
+3. Acessar a APISwagger UI: http://localhost:8081/swagger-ui.htmlH2 Console: http://localhost:8081/h2-console (JDBC URL: jdbc:h2:mem:testdb)📡 Endpoints PrincipaisMétodoEndpointDescriçãoGET/dealsLista todas as ofertas paginadasGET/deals/topLista ofertas com maior scorePOST/deals/fetchForça a busca de novos produtos manualmente📫 Desenvolvido por GHDev
+http://googleusercontent.com/interactive_content_block/0
