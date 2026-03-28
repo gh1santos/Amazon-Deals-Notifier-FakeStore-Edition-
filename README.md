@@ -3,7 +3,7 @@ Amazon Deals Notifier (FakeStore Edition)
 Sistema de monitoramento de ofertas baseado na FakeStore API
  com envio automático de notificações via Telegram.
 
-O projeto é desenvolvido em Java 17 com Spring Boot, utilizando Spring Data JPA para persistência em banco H2, e segue boas práticas de arquitetura para aplicações RESTful.
+O projeto é desenvolvido em Java 21 com Spring Boot, utilizando Spring Data JPA para persistência em banco H2, e segue boas práticas de arquitetura para aplicações RESTful.
 
 Funcionalidades
 Monitoramento de produtos da FakeStore API.
