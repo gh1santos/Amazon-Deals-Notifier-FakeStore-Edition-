@@ -1,0 +1,25 @@
+server:
+    port: 8081
+
+deal:
+    min-discount: 20
+
+scheduler:
+    interval: 600000
+
+spring:
+    datasource:
+        url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb}
+        username: ${SPRING_DATASOURCE_USERNAME:sa}
+        password: ${SPRING_DATASOURCE_PASSWORD:1132}
+        driver-class-name: org.h2.Driver
+    h2:
+        console:
+            enabled: true
+    jpa:
+        hibernate:
+            ddl-auto: update
+
+telegram:
+    bot-token: ${TELEGRAM_BOT_TOKEN:placeholder_bot_token}
+    chat-id: ${TELEGRAM_CHAT_ID:placeholder_chat_id}
